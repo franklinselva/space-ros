@@ -383,11 +383,44 @@ POST_INSTALLATION:
       && rm -rf excluded-deps.txt
   END
 
-# Target for prepping image(s) to be pushed to remote registries.
-push-image:
-  FROM +image
-
+###############################################################################
+### Push Image Stage for core image
+# This stage is responsible for pushing the core image to the registry.
+###############################################################################
+push-core-image:
   # This can be overridden with a blank string to prevent pushing to the registry.
-  ARG LATEST="osrf/space-ros:latest"
+  ARG --required VCS_REF
   ARG TAG
-  SAVE IMAGE --push ${LATEST} ${TAG}
+
+  FROM +image --IMAGE_VARIANT=core
+
+  LABEL org.label-schema.schema-version="1.0"
+  LABEL org.label-schema.name="Space ROS - Core"
+  LABEL org.label-schema.description="Core version of the Space ROS platform"
+  LABEL org.label-schema.vendor="Open Robotics"
+  LABEL org.label-schema.url="https://github.com/space-ros"
+  LABEL org.label-schema.vcs-url="https://github.com/space-ros/space-ros"
+  LABEL org.label-schema.vcs-ref=${VCS_REF}
+
+  SAVE IMAGE --push ${IMAGE_NAME}:core ${TAG}
+
+###############################################################################
+### Push Image Stage for dev image
+# This stage is responsible for pushing the dev image to the registry.
+###############################################################################
+push-dev-image:
+  # This can be overridden with a blank string to prevent pushing to the registry.
+  ARG --required VCS_REF
+  ARG TAG
+
+  FROM +image --IMAGE_VARIANT=dev
+
+  LABEL org.label-schema.schema-version="1.0"
+  LABEL org.label-schema.name="Space ROS - Dev"
+  LABEL org.label-schema.description="Dev version of the Space ROS platform"
+  LABEL org.label-schema.vendor="Open Robotics"
+  LABEL org.label-schema.url="https://github.com/space-ros"
+  LABEL org.label-schema.vcs-url="https://github.com/space-ros/space-ros"
+  LABEL org.label-schema.vcs-ref=${VCS_REF}
+
+  SAVE IMAGE --push ${IMAGE_NAME}:dev ${TAG}
