@@ -301,7 +301,8 @@ prepare-image:
   LABEL org.label-schema.vcs-ref=${VCS_REF}
 
   # Add missing dependencies
-  RUN apt install -y libspdlog-dev \
+  RUN apt update \
+    && apt install -y libspdlog-dev \
       python3-numpy \
       python3-rosdistro \
       tzdata \
@@ -356,10 +357,10 @@ image:
 
   # Only save image if build-test is successful
   IF [ "${SKIP_BUILD_TEST}" = "true" ]
-    SAVE IMAGE --push ${IMAGE_NAME}:${IMAGE_VARIANT}
+    SAVE IMAGE ${IMAGE_NAME}:${IMAGE_VARIANT}
   ELSE
     BUILD +build-test
-    SAVE IMAGE --push ${IMAGE_NAME}:${IMAGE_VARIANT}
+    SAVE IMAGE ${IMAGE_NAME}:${IMAGE_VARIANT}
   END
 
 ###############################################################################
@@ -390,7 +391,6 @@ POST_INSTALLATION:
 push-core-image:
   # This can be overridden with a blank string to prevent pushing to the registry.
   ARG --required VCS_REF
-  ARG TAG
 
   FROM +image --IMAGE_VARIANT=core
 
@@ -402,7 +402,7 @@ push-core-image:
   LABEL org.label-schema.vcs-url="https://github.com/space-ros/space-ros"
   LABEL org.label-schema.vcs-ref=${VCS_REF}
 
-  SAVE IMAGE --push ${IMAGE_NAME}:core ${TAG}
+  SAVE IMAGE --push ${IMAGE_NAME}:core
 
 ###############################################################################
 ### Push Image Stage for dev image
@@ -411,7 +411,6 @@ push-core-image:
 push-dev-image:
   # This can be overridden with a blank string to prevent pushing to the registry.
   ARG --required VCS_REF
-  ARG TAG
 
   FROM +image --IMAGE_VARIANT=dev
 
@@ -423,4 +422,4 @@ push-dev-image:
   LABEL org.label-schema.vcs-url="https://github.com/space-ros/space-ros"
   LABEL org.label-schema.vcs-ref=${VCS_REF}
 
-  SAVE IMAGE --push ${IMAGE_NAME}:dev ${TAG}
+  SAVE IMAGE --push ${IMAGE_NAME}:dev
