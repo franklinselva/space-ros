@@ -20,8 +20,7 @@ jobs:
       - name: Build Space ROS
         id: build
         run: |
-          earthly --ci --output +sources
-          earthly --ci --output +build-testing
+          earthly --ci --output +build-test --VCS_REF="$(git rev-parse HEAD)"
           echo "archivename=$(basename log/build_results_archives/build_results_*.tar.bz2)" >> $GITHUB_ENV
       - name: Upload build results archive
         uses: actions/upload-artifact@v3
@@ -29,8 +28,9 @@ jobs:
           name: ${{env.archivename}}
           path: log/build_results_archives/${{env.archivename}}
           if-no-files-found: error
-  space-ros-image:
+  space-ros-core-image:
     runs-on: ubuntu-latest
+    needs: build-testing-results
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -46,8 +46,7 @@ jobs:
           sudo chmod 755 /usr/local/bin/earthly
       - name: Build spaceros image
         run: |
-          earthly --ci --output +sources
-          earthly --ci +image
+          earthly --ci --output +main-image --VCS_REF="$(git rev-parse HEAD)" --SKIP_BUILD_TESTS=true
       # Only push to latest if we are building a release
       - name: Set latest image tag
         id: set_build_tags
