@@ -29,7 +29,6 @@ jobs:
           if-no-files-found: error
   space-ros-core-image:
     runs-on: ubuntu-latest
-    needs: build-testing-results
     steps:
       - name: Checkout
         uses: actions/checkout@v3
