@@ -17,16 +17,15 @@ jobs:
         run: |
           sudo wget https://github.com/earthly/earthly/releases/latest/download/earthly-linux-amd64 -O /usr/local/bin/earthly
           sudo chmod 755 /usr/local/bin/earthly
-      - name: Build Space ROS
+      - name: Build Test Space ROS
         id: build
         run: |
           earthly --ci --output +build-test --VCS_REF="$(git rev-parse HEAD)"
-          echo "archivename=$(basename log/build_results_archives/build_results_*.tar.bz2)" >> $GITHUB_ENV
       - name: Upload build results archive
         uses: actions/upload-artifact@v3
         with:
-          name: ${{env.archivename}}
-          path: log/build_results_archives/${{env.archivename}}
+          name: build_results.tar.bz2
+          path: build_test_results.tar.bz2
           if-no-files-found: error
   space-ros-core-image:
     runs-on: ubuntu-latest

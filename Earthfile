@@ -280,7 +280,10 @@ build-test:
         --pytest-args "--disable-warnings" \
         --install-base ${SPACEROS_DIR}
 
-  SAVE ARTIFACT ${WORKSPACE_DIR}/log/build_results_archives/build_results_*.tar.bz2 AS LOCAL build_results.tar.bz2
+  # Create tar ball of the logs directory
+  RUN tar -cjf build_results.tar.bz2 log
+
+  SAVE ARTIFACT /workspace/build_results.tar.bz2 AS LOCAL build_results.tar.bz2
 
 ###############################################################################
 ### Image Stage
