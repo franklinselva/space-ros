@@ -17,19 +17,17 @@ jobs:
         run: |
           sudo wget https://github.com/earthly/earthly/releases/latest/download/earthly-linux-amd64 -O /usr/local/bin/earthly
           sudo chmod 755 /usr/local/bin/earthly
-      - name: Build Space ROS
+      - name: Build Test Space ROS
         id: build
         run: |
-          earthly --ci --output +sources
-          earthly --ci --output +build-testing
-          echo "archivename=$(basename log/build_results_archives/build_results_*.tar.bz2)" >> $GITHUB_ENV
+          earthly --ci --output +build-test --VCS_REF="$(git rev-parse HEAD)"
       - name: Upload build results archive
         uses: actions/upload-artifact@v3
         with:
-          name: ${{env.archivename}}
-          path: log/build_results_archives/${{env.archivename}}
+          name: build_results.tar.bz2
+          path: build_test_results.tar.bz2
           if-no-files-found: error
-  space-ros-image:
+  space-ros-core-image:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -46,16 +44,27 @@ jobs:
           sudo chmod 755 /usr/local/bin/earthly
       - name: Build spaceros image
         run: |
-          earthly --ci --output +sources
-          earthly --ci +image
-      - name: Push tagged spaceros images to Dockerhub
+          earthly --ci --output +main-image --VCS_REF="$(git rev-parse HEAD)" --SKIP_BUILD_TESTS=true
+      # Only push to latest if we are building a release
+      - name: Set latest image tag
+        id: set_build_tags
+        run: |
+          if [ "${{ github.ref_type }}" == "tag" ]; then
+            echo "latest_image_tag=osrf/space-ros:latest" >> $GITHUB_ENV
+          fi
+        env:
+          latest_image_tag: ""
+      # Push both tagged releases and the latest main builds to Dockerhub
+      - name: Push spaceros images to Dockerhub
+        if: ${{ github.ref_type == 'tag' || github.ref_name == 'main' }}
         env:
           DOCKER_HUB_TOKEN: ${{ secrets.DOCKER_HUB_RW_TOKEN }}
-        if: ${{ github.ref_type == 'tag' }}
+          LATEST_IMAGE_TAG: ${{ env.latest_image_tag }}
         run: |
           echo $DOCKER_HUB_TOKEN | docker login --username osrfbot --password-stdin
-          earthly --ci --push +push-image --TAG="osrf/space-ros:${{ github.ref_name }}" --LATEST="osrf/space-ros:latest"
+          earthly --ci --push +push-image --TAG="osrf/space-ros:${{ github.ref_name }}" --LATEST="$LATEST_IMAGE_TAG"
+      # Only push the main builds to GHCR
       - name: Push the main spaceros image to GHCR
         if: ${{ github.ref_name == 'main' }}
         run: |
-          earthly --ci --push +push-image --TAG="ghcr.io/space-ros/space-ros:main" --LATEST=""
+          earthly --ci --push +push-image --TAG="ghcr.io/space-ros/space-ros:${{ github.ref_name }}" --LATEST=""
