@@ -3,7 +3,7 @@
 
 IKOS is a static analysis tool that performs interprocedural analysis on C/C++ code.
 
-Make sure you are in the Space ROS Docker container before running the following commands.
+Make sure you are in the Space ROS Dev Docker container before running the following commands.
 
 ## Preparing Space ROS sources
 

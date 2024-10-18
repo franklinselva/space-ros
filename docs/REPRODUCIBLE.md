@@ -1,7 +1,8 @@
 
 # Reproducible Builds
 
-This section describes how to rebuild Space ROS and run the unit tests in the Docker container. Make sure the dev variant of the space ROS image is ready before proceeding.
+This section describes how to rebuild Space ROS and run the unit tests in the Docker container.
+Make sure the dev variant of the space ROS image is ready before proceeding.
 
 ## Preparing Space ROS sources
 
@@ -17,8 +18,8 @@ spaceros-user@d10d85c68f0e:~/spaceros_ws$ vcs import src < /opt/spaceros/scripts
 From there you can run a new build and any additional tests.
 
 ```bash
-spaceros-user@d10d85c68f0e:~/spaceros_ws$ colcon build --cmake-args -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON --no-warn-unused-cli
-spaceros-user@d10d85c68f0e:~/spaceros_ws$ colcon test --ctest-args -LE "(ikos|xfail)" --pytest-args -m "not xfail"
+spaceros-user@d10d85c68f0e:~/spaceros_ws$ colcon build --cmake-args -DCMAKE_BUILD_TYPE=Debug -DCMAKE_EXPORT_COMPILE_COMMANDS=ON --no-warn-unused-cli --install-base ${SPACEROS_DIR} --merge-install
+spaceros-user@d10d85c68f0e:~/spaceros_ws$ colcon test --ctest-args -LE "(ikos|xfail)" --pytest-args -m "not xfail" --install-base ${SPACEROS_DIR} --merge-install
 ```
 
 ## Running Tests
@@ -29,7 +30,7 @@ You can use colcon's `--packages-select` option to run a subset of packages.
 For example, to run tests only for the rcpputils package and display the output directly to the console (as well as saving it to a log file), you can run:
 
 ```bash
-spaceros-user@d10d85c68f0e:~/spaceros_ws$ colcon test --event-handlers console_direct+ --packages-select rcpputils
+spaceros-user@d10d85c68f0e:~/spaceros_ws$ colcon test --event-handlers console_direct+ --packages-select rcpputils --install-base ${SPACEROS_DIR} --merge-install
 ```
 
 ### Viewing Test Output

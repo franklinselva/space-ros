@@ -24,8 +24,8 @@ Make sure docker is running and the user has the necessary permissions to run do
 
 Space ROS comes in different flavors, the following image variants are available:
 
- - `main-image`: The core image contains the ROS 2 core packages, including the ROS 2 client libraries, the ROS 2 command line tools, and the ROS 2 middleware implementations.
- - `dev-image`: The dev image contains the core image and additional tools for development, such as the ROS 2 build tools, the ROS 2 test tools, and the ROS 2 launch tools.
+ - `main-image`: The main image contains the ROS 2 core packages, including the ROS 2 client libraries, the ROS 2 command line tools, and the ROS 2 middleware implementations.
+ - `dev-image`: The dev image contains the main image and additional tools for development, such as the ROS 2 build tools, the ROS 2 test tools, and the ROS 2 launch tools.
 
 Build the Space ROS Docker image by running the following command:
 
@@ -122,4 +122,3 @@ This container will have all the tools necessary for building and testing ROS 2 
 
 1. To use IKOS. you can follow the instructuions in the [IKOS Integration](./IKOS.md) documentation.
 2. To reproduce the build process, you can follow the instructions in the [Reproducible Builds](./REPRODUCIBLE.md) documentation.
-3. TODO: Add documentation on setting up the dev image as vscode remote container.
